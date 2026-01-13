@@ -1,7 +1,5 @@
 # MeetAI   
-### AI Meeting Minutes + Action Items + Trello-Style Kanban Board (Offline + Free)
-
-MeetAI is an AI-powered meeting assistant that converts meeting **audio recordings** (or pasted transcripts) into structured meeting minutes with actionable tasks.  
+It is an AI-powered meeting assistant that converts meeting **audio recordings** (or pasted transcripts) into structured meeting minutes with actionable tasks.  
 It runs **locally** using **Whisper (Speech-to-Text)** and **Ollama LLM (Llama 3 / Llama 3.2)**.
 
 > ✅ Audio → Transcript → Summary + Decisions + Action Items  
@@ -10,7 +8,7 @@ It runs **locally** using **Whisper (Speech-to-Text)** and **Ollama LLM (Llama 3
 
 ---
 
-## 📸 Screenshots / Demo
+## Screenshots / Demo
 
 ### Home Page
 <!-- Replace with your screenshot -->
@@ -30,9 +28,9 @@ It runs **locally** using **Whisper (Speech-to-Text)** and **Ollama LLM (Llama 3
 
 ---
 
-## 🚀 Features
+## Features
 
-### ✅ Meeting Minutes Extraction
+### Meeting Minutes Extraction
 - Upload **audio** OR paste **meeting transcript**
 - Automatically generates:
   - Summary
@@ -40,7 +38,7 @@ It runs **locally** using **Whisper (Speech-to-Text)** and **Ollama LLM (Llama 3
   - Risks / Blockers
   - Action Items
 
-### ✅ Smart Action Items
+### Smart Action Items
 Each extracted task includes:
 - Task description
 - Owner
@@ -49,11 +47,11 @@ Each extracted task includes:
 - Confidence score
 - Status
 
-### ✅ Editable Action Items Table
+### Editable Action Items Table
 - Edit task details directly
 - Save changes back to database
 
-### ✅ Trello-Style Kanban Board
+### Trello-Style Kanban Board
 - Drag & drop tasks across columns:
   - Backlog
   - To Do
@@ -61,23 +59,17 @@ Each extracted task includes:
   - Done
 - Status updates auto-save (API based)
 
-### ✅ Add New Tasks (Manual)
-- “+ Add Task” modal
-- Task instantly appears in:
-  - Editable table
-  - Kanban board
-
-### ✅ Export Options
+### Export Options
 - Export meeting minutes as **PDF**
 - Export tasks as **CSV**
 
-### ✅ Meeting History
+### Meeting History
 - All meetings stored in SQLite
 - History page listing all processed meetings
 
 ---
 
-## 🧰 Tech Stack
+## Tech Stack
 
 - **Backend:** Flask (Python)
 - **Database:** SQLite + SQLAlchemy
@@ -89,7 +81,7 @@ Each extracted task includes:
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 Meetai/
 │
@@ -126,16 +118,14 @@ Meetai/
 
 ---
 
-## ⚙️ Setup & Installation
+## Setup & Installation
 
-### 1️⃣ Clone the repository
+###  Clone the repository
 ```bash
 git clone https://github.com/22f3000586/Meetai.git
 cd Meetai
 ```
-
-
-2️⃣ Create and activate virtual environment
+ Create and activate virtual environment
 
 Windows
 ```bash
@@ -143,7 +133,7 @@ python -m venv venv
 venv\Scripts\activate
 ```
 
-3️⃣ Install dependencies
+Install dependencies
 ```bash
 pip install -r requirements.txt
 ```
