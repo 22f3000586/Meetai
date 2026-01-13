@@ -138,32 +138,37 @@ cd Meetai
 2️⃣ Create and activate virtual environment
 
 Windows
-
+```bash
 python -m venv venv
 venv\Scripts\activate
+```
 
 3️⃣ Install dependencies
+```bash
 pip install -r requirements.txt
-
+```
 Install Ollama
-
 Download: https://ollama.com/
 
 Pull LLM model
+```bash
 ollama pull llama3
-
+```
 
 (Alternative model)
-
+```bash
 ollama pull llama3.2:3b
-
+```
 Run the model (keep running in background)
+```bash
 ollama run llama3
-
+```
 ▶️ Run the App
+```bash
 python run.py
-
+```
 
 Open in browser:
-
+```bash
 http://127.0.0.1:5000
+```
