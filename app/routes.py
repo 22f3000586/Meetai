@@ -147,6 +147,8 @@ def update_meeting(meeting_id):
         owner = request.form.get(f"owner_{i}", "").strip()
         due_date = request.form.get(f"due_date_{i}", "").strip()
         priority = request.form.get(f"priority_{i}", "").strip()
+        status = request.form.get(f"status_{i}", "").strip()
+
 
         # keep safe defaults
         if not task:
@@ -158,6 +160,8 @@ def update_meeting(meeting_id):
             "owner": owner if owner else None,
             "due_date": due_date if due_date else None,
             "priority": priority if priority else action_items[i].get("priority", "Medium"),
+            "status": status if status else action_items[i].get("status", "To Do"),
+
         })
 
     data["action_items"] = updated_items
@@ -168,3 +172,72 @@ def update_meeting(meeting_id):
 
     flash("✅ Changes saved successfully!")
     return redirect(url_for("main.result", meeting_id=meeting.id))
+
+
+@main_bp.route("/api/task/status/<int:meeting_id>/<int:task_index>", methods=["POST"])
+def api_update_task_status(meeting_id, task_index):
+    meeting = Meeting.query.get_or_404(meeting_id)
+    data = json.loads(meeting.extracted_json)
+
+    payload = request.get_json(silent=True) or {}
+    new_status = payload.get("status")
+
+    allowed = ["Backlog", "To Do", "In Progress", "Done"]
+    if new_status not in allowed:
+        return {"ok": False, "error": "Invalid status"}, 400
+
+    action_items = data.get("action_items", [])
+    if task_index < 0 or task_index >= len(action_items):
+        return {"ok": False, "error": "Invalid task index"}, 400
+
+    action_items[task_index]["status"] = new_status
+    data["action_items"] = action_items
+
+    meeting.extracted_json = json.dumps(data, ensure_ascii=False)
+    db.session.commit()
+
+    return {"ok": True}
+
+@main_bp.route("/api/task/add/<int:meeting_id>", methods=["POST"])
+def api_add_task(meeting_id):
+    meeting = Meeting.query.get_or_404(meeting_id)
+    data = json.loads(meeting.extracted_json)
+
+    payload = request.get_json(silent=True) or {}
+
+    task = (payload.get("task") or "").strip()
+    owner = (payload.get("owner") or "").strip()
+    due_date = (payload.get("due_date") or "").strip()
+    priority = (payload.get("priority") or "Medium").strip()
+    status = (payload.get("status") or "To Do").strip()
+
+    if not task:
+        return {"ok": False, "error": "Task is required"}, 400
+
+    allowed_priority = ["Low", "Medium", "High"]
+    allowed_status = ["Backlog", "To Do", "In Progress", "Done"]
+
+    if priority not in allowed_priority:
+        priority = "Medium"
+    if status not in allowed_status:
+        status = "To Do"
+
+    new_item = {
+        "task": task,
+        "owner": owner if owner else None,
+        "due_date_text": None,
+        "due_date": due_date if due_date else None,
+        "priority": priority,
+        "confidence": 0.9,   # user-added task, confidence high
+        "status": status
+    }
+
+    if "action_items" not in data or not isinstance(data["action_items"], list):
+        data["action_items"] = []
+
+    data["action_items"].append(new_item)
+
+    meeting.extracted_json = json.dumps(data, ensure_ascii=False)
+    db.session.commit()
+
+    return {"ok": True}
