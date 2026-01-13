@@ -1,41 +1,56 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h3 class="mb-0">Meeting History</h3>
-  <a href="/" class="btn btn-outline-dark">New Transcript</a>
-</div>
+<div class="row justify-content-center">
+  <div class="col-lg-10">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <div>
+        <h3 class="fw-bold mb-0">Meeting Archives</h3>
+        <p class="text-muted mb-0">Review past summaries and action items</p>
+      </div>
+      <a href="/" class="btn btn-dark rounded-pill">
+        <i class="bi bi-plus-lg me-1"></i> New Meeting
+      </a>
+    </div>
 
-<div class="card shadow-sm border-0">
-  <div class="card-body">
-    {% if meetings and meetings|length > 0 %}
+    <div class="card shadow-sm border-0">
       <div class="table-responsive">
-        <table class="table table-bordered align-middle">
-          <thead class="table-light">
+        <table class="table table-hover mb-0 align-middle">
+          <thead class="bg-light">
             <tr>
-              <th>ID</th>
-              <th>Title</th>
-              <th>Created</th>
-              <th>Open</th>
+              <th class="ps-4 py-3 text-uppercase fs-xs text-muted">Title</th>
+              <th class="py-3 text-uppercase fs-xs text-muted text-center">Date</th>
+              <th class="pe-4 py-3 text-end text-uppercase fs-xs text-muted">Action</th>
             </tr>
           </thead>
           <tbody>
-            {% for m in meetings %}
+            {% if meetings %}
+              {% for m in meetings %}
               <tr>
-                <td>{{ m.id }}</td>
-                <td>{{ m.title or "Untitled Meeting" }}</td>
-                <td>{{ m.created_at }}</td>
-                <td>
-                  <a href="/result/{{ m.id }}" class="btn btn-sm btn-primary">Open</a>
+                <td class="ps-4 fw-semibold text-dark">
+                  <i class="bi bi-file-earmark-text me-2 text-primary"></i>
+                  {{ m.title or "Untitled Meeting" }}
+                </td>
+                <td class="text-center text-muted small">{{ m.created_at }}</td>
+                <td class="pe-4 text-end">
+                  <a href="/result/{{ m.id }}" class="btn btn-sm btn-light border">
+                    View <i class="bi bi-arrow-right ms-1"></i>
+                  </a>
                 </td>
               </tr>
-            {% endfor %}
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="3" class="text-center py-5 text-muted">
+                  <i class="bi bi-folder2-open fs-1 d-block mb-2"></i>
+                  No history found. Start by processing a meeting.
+                </td>
+              </tr>
+            {% endif %}
           </tbody>
         </table>
       </div>
-    {% else %}
-      <p class="text-muted mb-0">No meetings processed yet.</p>
-    {% endif %}
+    </div>
   </div>
 </div>
 

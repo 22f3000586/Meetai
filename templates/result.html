@@ -1,260 +1,192 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
   <div>
-    <h3 class="mb-0">Extracted Meeting Minutes</h3>
-    <div class="text-muted" style="font-size: 14px;">
-      {{ data.meeting_title or "Untitled Meeting" }}
+    <h2 class="fw-bold mb-1">Meeting Intelligence Results</h2>
+    <span class="badge bg-white text-dark border shadow-sm px-3 py-2 rounded-pill">
+      <i class="bi bi-calendar-event me-2 text-primary"></i>{{ data.meeting_title or "Untitled Meeting" }}
+    </span>
+  </div>
+
+  <div class="btn-group shadow-sm">
+    <a href="/export/pdf/{{ meeting.id }}" class="btn btn-white border bg-white"><i class="bi bi-file-pdf text-danger me-1"></i> PDF</a>
+    <a href="/export/csv/{{ meeting.id }}" class="btn btn-white border bg-white"><i class="bi bi-file-spreadsheet text-success me-1"></i> CSV</a>
+    <a href="/history" class="btn btn-white border bg-white">History</a>
+    <a href="/" class="btn btn-dark px-3"><i class="bi bi-plus-lg me-1"></i> New</a>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card shadow-sm border-0 mb-4 bg-primary text-white">
+      <div class="card-body p-4">
+        <h5 class="card-title opacity-75 small text-uppercase fw-bold">Executive Summary</h5>
+        <p class="card-text fs-6" style="line-height: 1.6;">{{ data.summary }}</p>
+      </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4">
+      <div class="card-body p-4">
+        <h6 class="fw-bold border-bottom pb-2 mb-3 text-primary"><i class="bi bi-check2-circle me-2"></i>Key Decisions</h6>
+        {% if data.decisions %}
+          <ul class="list-unstyled mb-0">
+            {% for d in data.decisions %}
+              <li class="mb-2 d-flex align-items-start small text-dark">
+                <i class="bi bi-arrow-right-short text-primary fs-5 mt-n1"></i> {{ d }}
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted small">None identified</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card shadow-sm border-0 border-start border-danger border-4">
+      <div class="card-body p-4">
+        <h6 class="fw-bold mb-3 text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Risks & Blockers</h6>
+        {% if data.risks_or_blockers %}
+          <ul class="mb-0 small ps-3">
+            {% for r in data.risks_or_blockers %}
+              <li class="mb-1 text-secondary">{{ r }}</li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted small mb-0">No risks identified.</p>
+        {% endif %}
+      </div>
     </div>
   </div>
 
-  <div class="d-flex gap-2">
-    <a href="/export/pdf/{{ meeting.id }}" class="btn btn-outline-success">Export PDF</a>
-    <a href="/export/csv/{{ meeting.id }}" class="btn btn-outline-primary">Export CSV</a>
-    <a href="/history" class="btn btn-outline-secondary">History</a>
-    <a href="/" class="btn btn-outline-dark">New Transcript</a>
-  </div>
-</div>
-
-<div class="card shadow-sm border-0 mb-3">
-  <div class="card-body">
-    <h5 class="mb-2">Summary</h5>
-    <p class="mb-0">{{ data.summary }}</p>
-  </div>
-</div>
-
-<div class="card shadow-sm border-0 mb-3">
-  <div class="card-body">
-    <h5 class="mb-2">Decisions</h5>
-    {% if data.decisions and data.decisions|length > 0 %}
-      <ul class="mb-0">
-        {% for d in data.decisions %}
-          <li>{{ d }}</li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p class="text-muted mb-0">No clear decisions found.</p>
-    {% endif %}
-  </div>
-</div>
-
-<div class="card shadow-sm border-0 mb-3">
-  <div class="card-body">
-
-    <form method="POST" action="/update/{{ meeting.id }}">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="mb-0">Action Items (Editable)</h5>
-        <button type="submit" class="btn btn-success btn-sm">Save Changes</button>
+  <div class="col-lg-8">
+    <div class="card shadow-sm border-0 mb-4">
+      <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0">Project Board</h5>
+        <button class="btn btn-sm btn-outline-dark rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#addTaskModal">
+          <i class="bi bi-plus-lg me-1"></i> Add Task
+        </button>
       </div>
-
-      <div class="mb-3">
-        <label class="form-label">Meeting Title</label>
-        <input type="text" class="form-control" name="meeting_title"
-               value="{{ data.meeting_title or '' }}">
-      </div>
-
-      {% if data.action_items and data.action_items|length > 0 %}
-        <div class="table-responsive">
-          <table class="table table-bordered align-middle">
-            <thead class="table-light">
-              <tr>
-                <th style="width: 32%;">Task</th>
-                <th style="width: 14%;">Owner</th>
-                <th style="width: 16%;">Due Date</th>
-                <th style="width: 12%;">Priority</th>
-                <th style="width: 16%;">Status</th>
-                <th style="width: 10%;">Confidence</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {% for a in data.action_items %}
-              <tr>
-                <td>
-                  <input class="form-control" name="task_{{ loop.index0 }}"
-                         value="{{ a.task }}">
-                </td>
-
-                <td>
-                  <input class="form-control" name="owner_{{ loop.index0 }}"
-                         value="{{ a.owner or '' }}" placeholder="Unassigned">
-                </td>
-
-                <td>
-                  <input class="form-control" name="due_date_{{ loop.index0 }}"
-                         value="{{ a.due_date or '' }}" placeholder="YYYY-MM-DD">
-                  {% if a.due_date_text %}
-                    <div class="text-muted mt-1" style="font-size: 12px;">
-                      detected: {{ a.due_date_text }}
+      <div class="card-body p-3">
+        <div class="row g-2">
+          {% set columns = [("Backlog", "secondary"), ("To Do", "primary"), ("In Progress", "warning"), ("Done", "success")] %}
+          {% for col_name, color in columns %}
+          <div class="col-md-3">
+            <div class="p-2 rounded-3 bg-light" style="min-height: 400px;" 
+                 ondrop="drop(event, '{{ col_name }}', {{ meeting.id }})" ondragover="allowDrop(event)">
+              <div class="px-1 mb-2">
+                <span class="badge rounded-pill bg-{{ color }} px-2 opacity-75">{{ col_name }}</span>
+              </div>
+              <div class="kanban-list d-flex flex-column gap-2">
+                {% for a in data.action_items %}
+                  {% if (a.status or "To Do") == col_name %}
+                    <div class="card border-0 shadow-sm p-3" style="cursor: grab;" draggable="true" 
+                         ondragstart="drag(event)" data-task-index="{{ loop.index0 }}">
+                      <div class="fw-bold text-dark small mb-2">{{ a.task }}</div>
+                      <div class="d-flex justify-content-between align-items-center mt-auto">
+                        <span class="badge badge-priority-{{ a.priority }} border-0" style="font-size: 0.65rem;">{{ a.priority }}</span>
+                        <span class="text-muted" style="font-size: 0.65rem;"><i class="bi bi-person me-1"></i>{{ a.owner or "???" }}</span>
+                      </div>
                     </div>
                   {% endif %}
-                </td>
-
-                <td>
-                  <select class="form-select" name="priority_{{ loop.index0 }}">
-                    <option value="Low" {% if a.priority=="Low" %}selected{% endif %}>Low</option>
-                    <option value="Medium" {% if a.priority=="Medium" %}selected{% endif %}>Medium</option>
-                    <option value="High" {% if a.priority=="High" %}selected{% endif %}>High</option>
-                  </select>
-                </td>
-
-                <td>
-                  <select class="form-select" name="status_{{ loop.index0 }}">
-                    <option value="Backlog" {% if a.status=="Backlog" %}selected{% endif %}>Backlog</option>
-                    <option value="To Do" {% if a.status=="To Do" %}selected{% endif %}>To Do</option>
-                    <option value="In Progress" {% if a.status=="In Progress" %}selected{% endif %}>In Progress</option>
-                    <option value="Done" {% if a.status=="Done" %}selected{% endif %}>Done</option>
-                  </select>
-                </td>
-
-                <td>
-                  <span class="badge text-bg-dark">{{ a.confidence }}</span>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-
-      {% else %}
-        <p class="text-muted mb-0">No action items found.</p>
-      {% endif %}
-
-    </form>
-  </div>
-</div>
-
-<div class="card shadow-sm border-0 mb-3">
-  <div class="card-body">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <div>
-        <h5 class="mb-0">Kanban Board (Drag & Drop)</h5>
-        <span class="text-muted" style="font-size: 13px;">Drag cards to update status</span>
-      </div>
-
-      <button type="button" class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#addTaskModal">
-        + Add Task
-      </button>
-    </div>
-
-    {% set columns = ["Backlog", "To Do", "In Progress", "Done"] %}
-
-    <div class="row g-3">
-      {% for col in columns %}
-      <div class="col-md-3">
-        <div class="border rounded p-2 bg-light"
-             ondrop="drop(event, '{{ col }}', {{ meeting.id }})"
-             ondragover="allowDrop(event)">
-
-          <div class="fw-semibold mb-2">{{ col }}</div>
-
-          <div class="kanban-list d-flex flex-column gap-2" style="min-height: 240px;">
-            {% for a in data.action_items %}
-              {% set idx = loop.index0 %}
-              {% if (a.status or "To Do") == col %}
-                <div class="card p-2 shadow-sm"
-                     style="cursor: grab;"
-                     draggable="true"
-                     ondragstart="drag(event)"
-                     data-task-index="{{ idx }}">
-
-                  <div class="fw-semibold">{{ a.task }}</div>
-
-                  <div class="text-muted mt-1" style="font-size: 12px;">
-                    {{ a.owner or "Unassigned" }}
-                    • {{ a.due_date or "N/A" }}
-                    • {{ a.priority }}
-                  </div>
-
-                </div>
-              {% endif %}
-            {% endfor %}
+                {% endfor %}
+              </div>
+            </div>
           </div>
-
+          {% endfor %}
         </div>
       </div>
-      {% endfor %}
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4">
+      <div class="card-body">
+        <form method="POST" action="/update/{{ meeting.id }}">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-bold mb-0 text-muted text-uppercase small">Edit Action Items</h6>
+            <button type="submit" class="btn btn-success btn-sm px-3 rounded-pill shadow-sm">Save Changes</button>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-sm align-middle small">
+              <tbody>
+                {% for a in data.action_items %}
+                <tr>
+                  <td><input class="form-control form-control-sm border-0 bg-transparent" name="task_{{ loop.index0 }}" value="{{ a.task }}"></td>
+                  <td style="width: 20%;"><input class="form-control form-control-sm border-0 bg-transparent" name="owner_{{ loop.index0 }}" value="{{ a.owner or '' }}" placeholder="Owner"></td>
+                  <td>
+                    <select class="form-select form-select-sm border-0" name="priority_{{ loop.index0 }}">
+                      <option value="Low" {% if a.priority=="Low" %}selected{% endif %}>Low</option>
+                      <option value="Medium" {% if a.priority=="Medium" %}selected{% endif %}>Medium</option>
+                      <option value="High" {% if a.priority=="High" %}selected{% endif %}>High</option>
+                    </select>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card shadow-sm border-0 overflow-hidden">
+      <div class="card-header bg-white py-3 px-4 border-0">
+        <h6 class="fw-bold mb-0 text-muted small text-uppercase">Raw Transcript</h6>
+      </div>
+      <pre class="mb-0 p-4 bg-light text-secondary" style="white-space: pre-wrap; font-size: 0.85rem; max-height: 300px; overflow-y: auto;">{{ transcript }}</pre>
     </div>
   </div>
 </div>
 
-
-<script src="{{ url_for('static', filename='board.js') }}"></script>
-<!-- Add Task Modal -->
 <div class="modal fade" id="addTaskModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Add New Task</h5>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header border-bottom-0 pt-4 px-4">
+        <h5 class="modal-title fw-bold">New Action Item</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-
-      <div class="modal-body">
-        <div class="mb-2">
-          <label class="form-label">Task</label>
-          <input id="newTask" class="form-control" placeholder="Eg: Deploy app on Render">
+      <div class="modal-body px-4">
+        <div class="mb-3">
+          <label class="form-label small fw-bold text-uppercase text-muted">Task Description</label>
+          <input id="newTask" class="form-control bg-light border-0" placeholder="e.g. Update API documentation">
         </div>
-
-        <div class="mb-2">
-          <label class="form-label">Owner</label>
-          <input id="newOwner" class="form-control" placeholder="Eg: Taniya">
+        <div class="row g-3 mb-3">
+          <div class="col-6">
+            <label class="form-label small fw-bold text-uppercase text-muted">Owner</label>
+            <input id="newOwner" class="form-control bg-light border-0" placeholder="Name">
+          </div>
+          <div class="col-6">
+            <label class="form-label small fw-bold text-uppercase text-muted">Due Date</label>
+            <input id="newDueDate" type="date" class="form-control bg-light border-0">
+          </div>
         </div>
-
-        <div class="mb-2">
-          <label class="form-label">Due Date</label>
-          <input id="newDueDate" type="date" class="form-control">
-        </div>
-
-        <div class="mb-2">
-          <label class="form-label">Priority</label>
-          <select id="newPriority" class="form-select">
-            <option value="Low">Low</option>
-            <option value="Medium" selected>Medium</option>
-            <option value="High">High</option>
-          </select>
-        </div>
-
-        <div class="mb-2">
-          <label class="form-label">Status</label>
-          <select id="newStatus" class="form-select">
-            <option value="Backlog">Backlog</option>
-            <option value="To Do" selected>To Do</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Done">Done</option>
-          </select>
+        <div class="row g-3">
+          <div class="col-6">
+            <label class="form-label small fw-bold text-uppercase text-muted">Priority</label>
+            <select id="newPriority" class="form-select bg-light border-0">
+              <option value="Low">Low</option>
+              <option value="Medium" selected>Medium</option>
+              <option value="High">High</option>
+            </select>
+          </div>
+          <div class="col-6">
+            <label class="form-label small fw-bold text-uppercase text-muted">Initial Status</label>
+            <select id="newStatus" class="form-select bg-light border-0">
+              <option value="Backlog">Backlog</option>
+              <option value="To Do" selected>To Do</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Done">Done</option>
+            </select>
+          </div>
         </div>
       </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-dark" onclick="addTask({{ meeting.id }})">Add</button>
+      <div class="modal-footer border-top-0 pb-4 px-4">
+        <button type="button" class="btn btn-light px-4 rounded-pill" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary px-4 rounded-pill" onclick="addTask({{ meeting.id }})">Create Task</button>
       </div>
     </div>
   </div>
 </div>
 
-
-<div class="card shadow-sm border-0 mb-3">
-  <div class="card-body">
-    <h5 class="mb-2">Risks / Blockers</h5>
-    {% if data.risks_or_blockers and data.risks_or_blockers|length > 0 %}
-      <ul class="mb-0">
-        {% for r in data.risks_or_blockers %}
-          <li>{{ r }}</li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p class="text-muted mb-0">No risks/blockers identified.</p>
-    {% endif %}
-  </div>
-</div>
-
-<div class="card shadow-sm border-0">
-  <div class="card-body">
-    <h5 class="mb-2">Original Transcript</h5>
-    <pre class="bg-light p-3 rounded border" style="white-space: pre-wrap;">{{ transcript }}</pre>
-  </div>
-</div>
+<script src="{{ url_for('static', filename='board.js') }}"></script>
 
 {% endblock %}

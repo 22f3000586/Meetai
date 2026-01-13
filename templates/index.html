@@ -2,46 +2,55 @@
 {% block content %}
 
 <div class="row justify-content-center">
-  <div class="col-lg-8">
+  <div class="col-lg-7">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold text-dark">Meeting Intelligence</h2>
+      <p class="text-secondary">Transform your chaotic meetings into structured action items.</p>
+    </div>
 
     <div class="card shadow-sm border-0">
-      <div class="card-body p-4">
-        <h3 class="mb-2">Meeting → Action Items Extractor</h3>
-        <p class="text-muted mb-4">
-          Upload meeting audio or paste transcript. Meet AI will generate summary, decisions, action items and blockers.
-        </p>
-
+      <div class="card-body p-4 p-md-5">
         <form method="POST" action="/process" enctype="multipart/form-data">
-          <div class="mb-3">
-            <label class="form-label">Meeting Title (optional)</label>
-            <input name="title" class="form-control" placeholder="Eg: Team Weekly Sync">
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">Upload Audio (optional)</label>
-            <input type="file" name="audio" class="form-control" accept=".mp3,.wav,.m4a">
-            <div class="form-text text-muted">
-              Recommended: under 3 minutes for faster processing.
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Meeting Title</label>
+            <div class="input-group">
+              <span class="input-group-text bg-white"><i class="bi bi-pencil-square"></i></span>
+              <input name="title" class="form-control border-start-0" placeholder="e.g. Q4 Growth Strategy Sync">
             </div>
           </div>
 
-          <div class="text-center fw-bold text-muted my-2">OR</div>
-
-          <div class="mb-3">
-            <label class="form-label">Transcript</label>
-            <textarea name="transcript" class="form-control" rows="10"
-              placeholder="Paste transcript here...&#10;&#10;Example:&#10;Taniya will create the UI by Wednesday.&#10;Riya will integrate whisper by Friday."></textarea>
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Step 1: Upload Audio</label>
+            <div class="p-4 border border-dashed rounded text-center bg-light">
+              <i class="bi bi-cloud-arrow-up fs-2 text-primary"></i>
+              <input type="file" name="audio" class="form-control mt-2" accept=".mp3,.wav,.m4a">
+              <small class="text-muted d-block mt-2">MP3, WAV, or M4A (Max 3-5 mins recommended)</small>
+            </div>
           </div>
 
-          <button class="btn btn-primary w-100">Generate Minutes</button>
+          <div class="position-relative my-4">
+            <hr>
+            <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 fw-bold text-muted">OR</span>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Step 2: Paste Transcript</label>
+            <textarea name="transcript" class="form-control shadow-none" rows="8"
+              placeholder="Paste your meeting notes or raw transcript here..."></textarea>
+          </div>
+
+          <button class="btn btn-primary w-100 py-3 shadow-sm rounded-3">
+            Generate Minutes
+          </button>
         </form>
       </div>
     </div>
 
-    <div class="text-center text-muted mt-3" style="font-size: 13px;">
-      ⚠ Keep <b>ollama run llama3</b> working in background while using this app.
+    <div class="text-center mt-4">
+      <div class="badge rounded-pill text-bg-dark p-2 px-3 fw-normal" style="opacity: 0.8;">
+        <i class="bi bi-terminal me-2"></i> ensure <code>ollama run llama3</code> is active
+      </div>
     </div>
-
   </div>
 </div>
 
