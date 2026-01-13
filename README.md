@@ -83,6 +83,7 @@ Each extracted task includes:
 
 ## Project Structure
 
+```text
 Meetai/
 │
 ├── run.py
@@ -90,30 +91,30 @@ Meetai/
 ├── .env
 │
 ├── app/
-│ ├── init.py
-│ ├── routes.py
-│ ├── models.py
-│ └── utils/
-│ ├── llm_extractor.py
-│ ├── whisper_transcriber.py
-│ ├── schema.py
-│ ├── date_resolver.py
-│ ├── export_utils.py
-│ └── text_cleaner.py
+│   ├── __init__.py
+│   ├── routes.py
+│   ├── models.py
+│   └── utils/
+│       ├── llm_extractor.py
+│       ├── whisper_transcriber.py
+│       ├── schema.py
+│       ├── date_resolver.py
+│       ├── export_utils.py
+│       └── text_cleaner.py
 │
 ├── templates/
-│ ├── base.html
-│ ├── index.html
-│ ├── result.html
-│ └── history.html
+│   ├── base.html
+│   ├── index.html
+│   ├── result.html
+│   └── history.html
 │
 ├── static/
-│ └── board.js
+│   └── board.js
 │
 ├── uploads/
 ├── exports/
 └── instance/
-└── database.db
+    └── database.db
 
 
 ---
