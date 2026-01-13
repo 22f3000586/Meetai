@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0">Meeting History</h3>
+  <a href="/" class="btn btn-outline-dark">New Transcript</a>
+</div>
+
+<div class="card shadow-sm border-0">
+  <div class="card-body">
+    {% if meetings and meetings|length > 0 %}
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Created</th>
+              <th>Open</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in meetings %}
+              <tr>
+                <td>{{ m.id }}</td>
+                <td>{{ m.title or "Untitled Meeting" }}</td>
+                <td>{{ m.created_at }}</td>
+                <td>
+                  <a href="/result/{{ m.id }}" class="btn btn-sm btn-primary">Open</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted mb-0">No meetings processed yet.</p>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

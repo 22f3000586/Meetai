@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4">
+        <h3 class="mb-2">Meeting → Action Items Extractor</h3>
+        <p class="text-muted mb-4">
+          Upload meeting audio or paste transcript. Meet AI will generate summary, decisions, action items and blockers.
+        </p>
+
+        <form method="POST" action="/process" enctype="multipart/form-data">
+          <div class="mb-3">
+            <label class="form-label">Meeting Title (optional)</label>
+            <input name="title" class="form-control" placeholder="Eg: Team Weekly Sync">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Upload Audio (optional)</label>
+            <input type="file" name="audio" class="form-control" accept=".mp3,.wav,.m4a">
+            <div class="form-text text-muted">
+              Recommended: under 3 minutes for faster processing.
+            </div>
+          </div>
+
+          <div class="text-center fw-bold text-muted my-2">OR</div>
+
+          <div class="mb-3">
+            <label class="form-label">Transcript</label>
+            <textarea name="transcript" class="form-control" rows="10"
+              placeholder="Paste transcript here...&#10;&#10;Example:&#10;Taniya will create the UI by Wednesday.&#10;Riya will integrate whisper by Friday."></textarea>
+          </div>
+
+          <button class="btn btn-primary w-100">Generate Minutes</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="text-center text-muted mt-3" style="font-size: 13px;">
+      ⚠ Keep <b>ollama run llama3</b> working in background while using this app.
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

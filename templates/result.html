@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h3 class="mb-0">Extracted Meeting Minutes</h3>
+    <div class="text-muted" style="font-size: 14px;">
+      {{ data.meeting_title or "Untitled Meeting" }}
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <a href="/export/pdf/{{ meeting.id }}" class="btn btn-outline-success">Export PDF</a>
+    <a href="/export/csv/{{ meeting.id }}" class="btn btn-outline-primary">Export CSV</a>
+    <a href="/history" class="btn btn-outline-secondary">History</a>
+    <a href="/" class="btn btn-outline-dark">New Transcript</a>
+  </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-3">
+  <div class="card-body">
+    <h5 class="mb-2">Summary</h5>
+    <p class="mb-0">{{ data.summary }}</p>
+  </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-3">
+  <div class="card-body">
+    <h5 class="mb-2">Decisions</h5>
+    {% if data.decisions and data.decisions|length > 0 %}
+      <ul class="mb-0">
+        {% for d in data.decisions %}
+          <li>{{ d }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted mb-0">No clear decisions found.</p>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-3">
+  <div class="card-body">
+
+    <form method="POST" action="/update/{{ meeting.id }}">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Action Items (Editable)</h5>
+        <button type="submit" class="btn btn-success btn-sm">Save Changes</button>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Meeting Title</label>
+        <input type="text" class="form-control" name="meeting_title"
+               value="{{ data.meeting_title or '' }}">
+      </div>
+
+      {% if data.action_items and data.action_items|length > 0 %}
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle">
+            <thead class="table-light">
+              <tr>
+                <th style="width: 32%;">Task</th>
+                <th style="width: 14%;">Owner</th>
+                <th style="width: 16%;">Due Date</th>
+                <th style="width: 12%;">Priority</th>
+                <th style="width: 16%;">Status</th>
+                <th style="width: 10%;">Confidence</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for a in data.action_items %}
+              <tr>
+                <td>
+                  <input class="form-control" name="task_{{ loop.index0 }}"
+                         value="{{ a.task }}">
+                </td>
+
+                <td>
+                  <input class="form-control" name="owner_{{ loop.index0 }}"
+                         value="{{ a.owner or '' }}" placeholder="Unassigned">
+                </td>
+
+                <td>
+                  <input class="form-control" name="due_date_{{ loop.index0 }}"
+                         value="{{ a.due_date or '' }}" placeholder="YYYY-MM-DD">
+                  {% if a.due_date_text %}
+                    <div class="text-muted mt-1" style="font-size: 12px;">
+                      detected: {{ a.due_date_text }}
+                    </div>
+                  {% endif %}
+                </td>
+
+                <td>
+                  <select class="form-select" name="priority_{{ loop.index0 }}">
+                    <option value="Low" {% if a.priority=="Low" %}selected{% endif %}>Low</option>
+                    <option value="Medium" {% if a.priority=="Medium" %}selected{% endif %}>Medium</option>
+                    <option value="High" {% if a.priority=="High" %}selected{% endif %}>High</option>
+                  </select>
+                </td>
+
+                <td>
+                  <select class="form-select" name="status_{{ loop.index0 }}">
+                    <option value="Backlog" {% if a.status=="Backlog" %}selected{% endif %}>Backlog</option>
+                    <option value="To Do" {% if a.status=="To Do" %}selected{% endif %}>To Do</option>
+                    <option value="In Progress" {% if a.status=="In Progress" %}selected{% endif %}>In Progress</option>
+                    <option value="Done" {% if a.status=="Done" %}selected{% endif %}>Done</option>
+                  </select>
+                </td>
+
+                <td>
+                  <span class="badge text-bg-dark">{{ a.confidence }}</span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+      {% else %}
+        <p class="text-muted mb-0">No action items found.</p>
+      {% endif %}
+
+    </form>
+  </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-3">
+  <div class="card-body">
+    <h5 class="mb-2">Risks / Blockers</h5>
+    {% if data.risks_or_blockers and data.risks_or_blockers|length > 0 %}
+      <ul class="mb-0">
+        {% for r in data.risks_or_blockers %}
+          <li>{{ r }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted mb-0">No risks/blockers identified.</p>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card shadow-sm border-0">
+  <div class="card-body">
+    <h5 class="mb-2">Original Transcript</h5>
+    <pre class="bg-light p-3 rounded border" style="white-space: pre-wrap;">{{ transcript }}</pre>
+  </div>
+</div>
+
+{% endblock %}
