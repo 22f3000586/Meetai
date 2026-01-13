@@ -1,4 +1,4 @@
-# MeetAI 🎙️🧠✅  
+# MeetAI   
 ### AI Meeting Minutes + Action Items + Trello-Style Kanban Board (Offline + Free)
 
 MeetAI is an AI-powered meeting assistant that converts meeting **audio recordings** (or pasted transcripts) into structured meeting minutes with actionable tasks.  
