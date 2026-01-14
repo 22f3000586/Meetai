@@ -163,3 +163,5 @@ Open in browser:
 ```bash
 http://127.0.0.1:5000
 ```
+Contributing
+Contributions are welcome! If you have suggestions for new features or UI improvements, feel free to open an issue or submit a pull request.
